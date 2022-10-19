@@ -1,0 +1,142 @@
+.tasks {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  background-color: #3b4b500b;
+  border: solid #3b4b504a 0.1px;
+  padding: 10px;
+  height: 65vh;
+  width: 50vw;
+  margin: 5vh auto;
+  position: relative;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+}
+
+.button {
+  display: flex;
+  margin-left: auto;
+  height: 30px;
+  width: 30px;
+  margin-right: 20px;
+  align-self: center;
+  justify-content: center;
+  transition: transform 250ms ease;
+}
+
+.button:hover {
+  transform: scale(1.1);
+}
+
+.svg {
+  text-align: center;
+  font-size: 10px;
+  color: #3b4b50da;
+}
+
+.form {
+  font-size: 13px;
+  border: solid #3b4b503c 1px;
+  padding: 5px;
+  margin-bottom: 2px;
+  display: flex;
+  flex-wrap: nowrap;
+  transition: all 1000ms ease-in-out;
+  position: absolute;
+  transform: translateX(1000px);
+  opacity: 0;
+}
+
+.form-visible {
+  font-size: 13px;
+  border: solid #3b4b503c 1px;
+  padding: 5px;
+  margin-bottom: 2px;
+  display: flex;
+  flex-wrap: nowrap;
+  transition: all 500ms ease-in-out;
+  position: static;
+  transform: translateX(0px);
+}
+
+.form input {
+  margin: 0px 5px;
+}
+
+.b-done {
+  align-self: center;
+  padding: 3px;
+  margin-right: 5px;
+}
+
+table,
+tr {
+  width: 100%;
+}
+
+.task-title {
+  width: 70%;
+}
+
+.task-form-title {
+  margin: auto;
+  width: 95%;
+}
+
+.task-form-date {
+  margin: auto;
+  width: 90%;
+}
+
+.task-date {
+  width: 20%;
+}
+
+.task-bar {
+  position: absolute;
+  top: 120px;
+  width: 97%;
+  transition: all 600ms ease-in-out;
+}
+
+.task-bar-move {
+  top: 200px;
+}
+.greetingBar {
+  font-size: 23px;
+  text-align: center;
+  font-weight: 100;
+}
+
+@media screen and (max-width: 1000px) {
+  .tasks {
+    width: 80vw;
+  }
+}
+@media screen and (max-width: 500px) {
+  .greetingBar {
+    font-size: 20px;
+  }
+  .b-done {
+    font-size: 12px;
+  }
+  .form-visible {
+    display: block;
+  }
+
+  .task-bar {
+    top: 106px;
+  }
+  .task-bar-move {
+    top: 210px;
+  }
+  .doneBtn {
+    display: flex;
+    justify-content: center;
+  }
+  .tasks {
+    padding: 4px;
+  }
+}

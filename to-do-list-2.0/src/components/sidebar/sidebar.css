@@ -1,0 +1,57 @@
+.sidebar {
+  padding-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: solid #3b4b506b;
+  border-style: inset;
+  width: 30vw;
+  font-size: 40px;
+}
+
+.greeting {
+  font-size: 30px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.upcoming {
+  margin-top: 30px;
+  font-size: 20px;
+}
+
+.blink {
+  display: inline-block;
+  font-size: 40px;
+  font-weight: 900;
+  transform: translateY(-3px);
+  margin: 0px 2px;
+}
+
+.table {
+  font-size: 15px;
+  margin-top: 20px;
+  border-collapse:collapse;
+  width:90%;
+  transition: transform 250ms ease-out;
+}
+
+.table:hover{
+  transform:scale(1.05)
+}
+
+.table, .th, .td{
+  border-bottom: solid #3b4b505f 1px;
+}
+
+.td, .th{
+  text-align: center;
+  font-size: 11px;
+}
+
+@media screen and (max-width:1000px) {
+  .sidebar{
+    width: 80vw;
+    padding: 20px;
+  }
+}

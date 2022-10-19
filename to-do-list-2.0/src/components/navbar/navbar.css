@@ -1,0 +1,47 @@
+.navbar {
+  display: flexbox;
+  background-color: #f6f4f1;
+  position: relative;
+  height: 9vh;
+  padding: 10px;
+}
+
+.nav-brand {
+  display: inline-block;
+  margin: 0px auto 0px 0px;
+  font-size: 25px;
+  border: #3b4b501d solid 3px;
+  padding: 3px;
+  border-style: ridge;
+}
+
+.logo {
+  position: absolute;
+  margin-top: 30px;
+  top: -30%;
+  left: 45%;
+  height: 70px;
+  width: 70px;
+}
+
+.logout {
+  transition: transform 250ms ease;
+  height: 30px;
+  position:absolute;
+  right:5vw;
+  padding: 5px;
+}
+
+.logout:hover{
+  transform: scale(1.1);
+}
+
+@media screen and (max-width:500px) {
+  .nav-brand{
+    font-size: 18px;
+  }
+  .logout{
+    font-size: 12px;
+    padding: 5px;
+  }
+}

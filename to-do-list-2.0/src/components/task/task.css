@@ -1,0 +1,85 @@
+.task {
+  margin-bottom: 1px;
+  padding: 3px;
+  background: #3b4b503c;
+  backdrop-filter: blur(16.1px);
+  border: 1px solid rgba(255, 255, 255, 0.387);
+}
+
+.head {
+  display: grid;
+  grid-template-columns: auto auto;
+  position: relative;
+}
+
+.actions {
+  margin-left: auto;
+}
+
+.action-button {
+  margin: 1px;
+  transform: scale(0.8);
+}
+
+.task-header {
+  border-bottom: solid #3b4b50da 1px;
+  transition: all 250ms ease-in-out;
+}
+
+.task-header:hover {
+  transform: scale(1.02);
+}
+
+.a-svg {
+  color: #3b4b50da;
+  text-align: center;
+}
+
+.title {
+  transform: translateY(4px);
+  font-weight: 900;
+}
+
+.status {
+  font-size: 10px;
+}
+
+.status-color {
+  display: inline-block;
+  margin: 0px 2px;
+  border-radius: 10px;
+  height: 10px;
+  width: 10px;
+}
+
+.status-color-green {
+  background-color: rgb(26, 213, 73);
+}
+
+.status-color-red {
+  background-color: rgb(246, 54, 54);
+}
+
+.deadline {
+  position: absolute;
+  display: inline-block;
+  margin: auto;
+  font-weight: 400;
+  font-size: 12px;
+  left: 60%;
+  top: 30%;
+}
+@media screen and (max-width: 1000px) {
+  .deadline {
+    font-size: 10px;
+    left: 45%;
+  }
+  .title {
+    font-size: 13px;
+  }
+  .action-button {
+    width: 37px;
+    height:30px;
+  }
+}
+
