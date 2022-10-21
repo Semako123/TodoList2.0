@@ -1,5 +1,6 @@
 import React from "react";
 import "./login.css";
+import { auth } from "../firebase";
 import image from "../images/Checklist.gif";
 import image2 from "../images/Completed.gif";
 import logo from "../images/oases.png";
@@ -11,42 +12,38 @@ import {
   Input,
   FormControl,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Password, Visibility, VisibilityOff } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Navigate, redirect, useNavigate } from "react-router";
-import { Redirect } from "react-router";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 const Login = () => {
-  const navigate = useNavigate();
   const API = axios.create({
     baseURL: "http://127.0.0.1:5000",
   });
-  const [userName, setuserName] = useState("");
+
+  const [Email, setEmail] = useState("");
   const [password, setpassword] = useState("");
   const [conPassword, setconPassword] = useState("");
   const [errMessage, seterrMessage] = useState({
-    userName: "",
-    passWord: "",
+    Email: "",
+    password: "",
     conPassword: "",
   });
   const [errorState, seterrorState] = useState({
     password: false,
-    userName: false,
+    Email: false,
     conPassword: false,
   });
 
   useEffect(() => {
-    handleConPasswordValid();
-  }, [conPassword, password]);
-
-  useEffect(() => {
     handlePasswordValid();
-  }, [password]);
-
-  useEffect(() => {
-    handleNameValid();
-  }, [userName]);
+    handleConPasswordValid();
+    handleEmailValid();
+  }, [Password, conPassword, Email]);
 
   const [value, setValue] = useState({
     showPassword: false,
@@ -69,27 +66,27 @@ const Login = () => {
     }
   };
 
-  const handleNameValid = () => {
-    if (userName.length < 5) {
+  const handleEmailValid = () => {
+    if (Email.length < 5) {
       seterrMessage({
         ...errMessage,
-        userName: "Username is less than 5 characters",
+        Email: "Email is less than 5 characters",
       });
-      seterrorState({ ...errorState, userName: true });
+      seterrorState({ ...errorState, Email: true });
     } else {
-      seterrMessage({ ...errMessage, userName: "" });
-      seterrorState({ ...errorState, userName: false });
+      seterrMessage({ ...errMessage, Email: "" });
+      seterrorState({ ...errorState, Email: false });
     }
   };
   const handlePasswordValid = () => {
     if (password.length < 8) {
       seterrMessage({
         ...errMessage,
-        passWord: "Password is less than 8 characters",
+        password: "Password is less than 8 characters",
       });
       seterrorState({ ...errorState, password: true });
     } else {
-      seterrMessage({ ...errMessage, passWord: "" });
+      seterrMessage({ ...errMessage, password: "" });
       seterrorState({ ...errorState, password: false });
     }
   };
@@ -101,10 +98,10 @@ const Login = () => {
   const setDefault = () => {
     setValue({ ...value, showPassword: false });
     setpassword("");
-    setuserName("");
+    setEmail("     ");
     setconPassword("");
-    seterrorState({ userName: false, password: false, conPassword: false });
-    seterrMessage({ userName: "", passWord: "", conPassword: "" });
+    seterrMessage({ Email: "", password: "", conPassword: "" });
+    seterrorState({ Email: false, password: false, conPassword: false });
   };
 
   const handleSwitchSignup = () => {
@@ -123,8 +120,8 @@ const Login = () => {
     setDefault();
   };
 
-  const handleNameChange = (e) => {
-    setuserName(e.target.value);
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
   };
 
   const handlePassChange = (e) => {
@@ -138,31 +135,28 @@ const Login = () => {
   const handleSignupRq = () => {
     handleConPasswordValid();
     handlePasswordValid();
-    handleNameValid();
-    if (
-      !(errMessage.conPassword || errMessage.passWord || errMessage.userName)
-    ) {
-      API.post("/signup", {
-        username: userName,
-        password: password,
-        conPassword: conPassword,
-      }).then((res) => {
-        if (res.data.status == "success") {
-          const token = JSON.stringify({ name: "", id: "" });
-          sessionStorage.setItem(token);
-          <Navigate to="/" />;
-        } else {
-          console.log(res.data);
-        }
-      });
+    handleEmailValid();
+    if (!(errMessage.conPassword || errMessage.password || errMessage.Email)) {
+      createUserWithEmailAndPassword(auth, Email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log(user);
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+        });
     }
   };
   const handleLoginRq = () => {
-    API.post("/login", { username: userName, password: password }).then(
-      (res) => {
-        console.log(res);
-      }
-    );
+    signInWithEmailAndPassword(auth, Email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
   };
 
   return (
@@ -184,10 +178,11 @@ const Login = () => {
               <div className="formField">
                 <TextField
                   className="textField"
-                  label="Username or email"
+                  label="Email"
                   variant="standard"
-                  value={userName}
-                  onChange={handleNameChange}
+                  value={Email}
+                  onChange={handleEmailChange}
+                  type="email"
                 />
                 <FormControl variant="standard">
                   <InputLabel
@@ -239,13 +234,15 @@ const Login = () => {
               <h5 className="intro">Welcome to Oases Todo</h5>
               <div className="formField">
                 <TextField
-                  error={errorState.userName}
+                  error={errorState.Email}
                   className="textField"
-                  label="Username or email"
+                  label="Email"
                   variant="standard"
-                  value={userName}
-                  onChange={handleNameChange}
-                  helperText={errMessage.userName}
+                  value={Email}
+                  onChange={handleEmailChange}
+                  onBlur={handleEmailValid}
+                  helperText={errMessage.Email}
+                  type="email"
                 />
                 <FormControl variant="standard">
                   <InputLabel
@@ -260,6 +257,7 @@ const Login = () => {
                     className="passField"
                     type={value.showPassword ? "text" : "password"}
                     value={password}
+                    onBlur={handlePasswordValid}
                     onChange={handlePassChange}
                     endAdornment={
                       <InputAdornment position="end">
@@ -279,7 +277,7 @@ const Login = () => {
                     }
                   />
                 </FormControl>
-                <div className="errorMessage">{errMessage.passWord}</div>
+                <div className="errorMessage">{errMessage.password}</div>
                 <FormControl variant="standard">
                   <InputLabel
                     htmlFor="standard-adornment-password"
@@ -293,6 +291,7 @@ const Login = () => {
                     className="passField"
                     type={value.showPassword ? "text" : "password"}
                     value={conPassword}
+                    onBlur={handleConPasswordValid}
                     onChange={handleConPassChange}
                     endAdornment={
                       <InputAdornment position="end">
