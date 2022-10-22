@@ -14,16 +14,14 @@ import {
 } from "@mui/material";
 import { Password, Visibility, VisibilityOff } from "@mui/icons-material";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const API = axios.create({
-    baseURL: "http://127.0.0.1:5000",
-  });
+  const navigate = useNavigate();
 
   const [Email, setEmail] = useState("");
   const [password, setpassword] = useState("");
@@ -332,5 +330,4 @@ const Login = () => {
     </>
   );
 };
-
 export default Login;

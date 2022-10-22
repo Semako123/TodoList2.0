@@ -1,9 +1,8 @@
-import React from 'react'
+import React from "react";
+import { Navigate } from "react-router";
 
-co = () => {
-  return (
-    <</div>
-  )
-}
+const RequireAuth = ({ status, children }) => {
+  return status ? children : <Navigate to="auth" />;
+};
 
-export defa
+export default RequireAuth;

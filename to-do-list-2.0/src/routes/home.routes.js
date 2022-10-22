@@ -1,5 +1,14 @@
 import App from "../App";
-import { Navigate } from "react-router";
+import RequireAuth from "../components/utilities/requireAuth";
 
-const HomeRoute = [{ path: "/", element: <App /> }];
+const HomeRoute = [
+  {
+    path: "/",
+    element: (
+      <RequireAuth status={true}>
+        <App />
+      </RequireAuth>
+    ),
+  },
+];
 export default HomeRoute;
