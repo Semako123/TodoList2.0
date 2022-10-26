@@ -5,7 +5,7 @@ const HomeRoute = [
   {
     path: "/",
     element: (
-      <RequireAuth status={true}>
+      <RequireAuth>
         <App />
       </RequireAuth>
     ),

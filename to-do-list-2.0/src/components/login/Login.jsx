@@ -18,11 +18,14 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
+import { authActions } from "../../store/authSlicer";
 
 const Login = () => {
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
+  const currentUser = useSelector((state) => (state.auth.user))
   const [Email, setEmail] = useState("");
   const [password, setpassword] = useState("");
   const [conPassword, setconPassword] = useState("");
@@ -138,11 +141,13 @@ const Login = () => {
       createUserWithEmailAndPassword(auth, Email, password)
         .then((userCredential) => {
           const user = userCredential.user;
-          console.log(user);
+          dispatch(authActions.login(localStorage.setItem("user", JSON.stringify(user))));
+          navigate("/");
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
+          console.log(errorMessage);
         });
     }
   };
@@ -150,13 +155,19 @@ const Login = () => {
     signInWithEmailAndPassword(auth, Email, password)
       .then((userCredential) => {
         const user = userCredential.user;
+        dispatch(
+          authActions.login(localStorage.setItem("user", JSON.stringify(user)))
+        );
+        navigate("/");
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
+        console.log(errorMessage);
       });
   };
 
+  console.log(currentUser)
   return (
     <>
       <div className="background">
