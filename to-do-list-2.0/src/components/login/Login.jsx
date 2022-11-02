@@ -21,11 +21,13 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { authActions } from "../../store/authSlicer";
+import { db } from "../firebase";
+import { setDoc, doc } from "firebase/firestore";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const currentUser = useSelector((state) => (state.auth.user))
+  const currentUser = useSelector((state) => state.auth.user);
   const [Email, setEmail] = useState("");
   const [password, setpassword] = useState("");
   const [conPassword, setconPassword] = useState("");
@@ -40,6 +42,11 @@ const Login = () => {
     conPassword: false,
   });
 
+  const createUserNote = async () => {
+    await setDoc(doc(db, "notes", `${currentUser.uid}`), {
+      id: 0,
+    });
+  };
   useEffect(() => {
     handlePasswordValid();
     handleConPasswordValid();
@@ -141,7 +148,12 @@ const Login = () => {
       createUserWithEmailAndPassword(auth, Email, password)
         .then((userCredential) => {
           const user = userCredential.user;
-          dispatch(authActions.login(localStorage.setItem("user", JSON.stringify(user))));
+          dispatch(
+            authActions.login(
+              localStorage.setItem("user", JSON.stringify(user))
+            )
+          );
+          createUserNote();
           navigate("/");
         })
         .catch((error) => {
@@ -167,7 +179,7 @@ const Login = () => {
       });
   };
 
-  console.log(currentUser)
+  console.log(currentUser);
   return (
     <>
       <div className="background">
