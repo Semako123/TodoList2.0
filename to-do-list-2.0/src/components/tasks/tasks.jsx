@@ -1,25 +1,21 @@
 import React from "react";
 import "./tasks.css";
-import { Add } from "@mui/icons-material";
+import { Add, ConstructionOutlined } from "@mui/icons-material";
 import Task from "../task/task";
 import { Tooltip } from "@mui/material";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import convertTens from "../utilities/convertTens";
 import { LinearProgress } from "@mui/material";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useSelector } from "react-redux";
-import { query, where, collection, getDocs } from "firebase/firestore";
+import { onSnapshot } from "firebase/firestore";
 
 const Notes = () => {
   const [task, settask] = useState("");
+  const [taskId, settaskId] = useState(0);
   const [tasks, settasks] = useState({});
-  const [id, setid] = useState(0);
   const [deadline, setdeadline] = useState("");
-  const API = axios.create({
-    baseURL: "https://glacial-river-97602.herokuapp.com/",
-  });
   const currentUser = useSelector((state) => state.auth.user);
 
   const handleTaskChange = (e) => {
@@ -53,41 +49,39 @@ const Notes = () => {
 
   const handleSubmit = async () => {
     if (task && deadline) {
-      const q = query(
-        collection(db, "notes"),
-        where("__name__", "==", currentUser.uid)
-      );
-      const querySnapshot = await getDocs(q);
-      let id;
-      querySnapshot.forEach((doc) => {
-        id = doc.data().id;
-      });
       await setDoc(
         doc(db, "notes", `${currentUser.uid}`),
         {
-          note: {
-            id: id,
-            value: task,
-            deadline: deadline,
-          },
-          id: ++id,
+          note: [
+            ...tasks.data,
+            {
+              title: task,
+              deadline: deadline,
+            },
+          ],
         },
         { merge: true }
       );
-      const emptyString = "";
-      settask(emptyString);
-      setdeadline(emptyString);
-      handleCancelTaskInput();
     }
+    const emptyString = "";
+    settask(emptyString);
+    setdeadline(emptyString);
+    handleCancelTaskInput();
   };
 
-  const handleUpdate = () => {
-    API.post("/update", { title: task, deadline: deadline, id: id }).then(
-      (res) => {
-        setid(0);
-        fetchTasks();
-      }
+  const handleUpdate = async () => {
+    const new_obj = {
+      title: task,
+      deadline: deadline,
+    };
+    const newtasks = [...tasks.data];
+    newtasks.splice(taskId, 1, new_obj);
+    await setDoc(
+      doc(db, "notes", `${currentUser.uid}`),
+      { note: newtasks },
+      { merge: true }
     );
+    fetchTasks();
     handleCancelTaskInput();
   };
 
@@ -100,25 +94,29 @@ const Notes = () => {
     )}-${convertTens(dateTime.getDate())}T${convertTens(
       dateTime.getHours()
     )}:${convertTens(dateTime.getMinutes())}`;
+    settaskId(taskId);
     settask(title);
     setdeadline(newDeadline);
-    setid(taskId);
     addBtn.style.display = "none";
     doneBtn.style.display = "block";
     handleShowTaskInput();
   };
 
-  const handleDelete = (id) => {
-    API.post("/delete", { id: id }).then((res) => fetchTasks());
+  const handleDelete = async (id) => {
+    const newtasks = [...tasks.data];
+    newtasks.splice(id, 1);
+    await setDoc(
+      doc(db, "notes", `${currentUser.uid}`),
+      { note: newtasks },
+      { merge: true }
+    );
   };
 
   const fetchTasks = () => {
-    API.get("/fetch-tasks").then((res) => {
-      const new_tasks = res.data;
-      settasks(new_tasks);
+    onSnapshot(doc(db, "notes", `${currentUser.uid}`), (snapshot) => {
+      settasks({ data: snapshot.data().note });
     });
   };
-
   useEffect(() => {
     fetchTasks();
   }, []);
@@ -189,17 +187,17 @@ const Notes = () => {
             tasks.data.length === 0 ? (
               "No tasks added yet. Click on the '+' button to add a new task "
             ) : (
-              tasks.data.map((task) => (
+              tasks.data.map((task, index) => (
                 <Task
                   title={task.title}
                   deadline={task.deadline}
-                  key={task.id}
-                  id={task.id}
+                  key={index}
+                  id={index}
                   handleDelete={() => {
-                    handleDelete(task.id);
+                    handleDelete(index);
                   }}
                   handleEdit={() => {
-                    handleEdit(task.id, task.title, task.deadline);
+                    handleEdit(index, task.title, task.deadline);
                   }}
                 />
               ))

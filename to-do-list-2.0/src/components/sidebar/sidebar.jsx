@@ -1,7 +1,6 @@
 import React from "react";
 import "./sidebar.css";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { LinearProgress } from "@mui/material";
 import convertTens from "../utilities/convertTens";
 
@@ -13,28 +12,12 @@ const Sidebar = () => {
   hours = date.getHours();
   minutes = date.getMinutes();
 
-  const API = axios.create({
-    baseURL: "https://glacial-river-97602.herokuapp.com/",
-  });
-
-  const fetchTasks = () => {
-    API.get("/fetch-tasks").then((res) => {
-      const new_tasks = res.data;
-      settasks(new_tasks);
-    });
-  };
-
   useEffect(() => {
     setInterval(() => {
       setdate(new Date());
     }, 1000);
   }, []);
 
-  useEffect(() => {
-    setInterval(() => {
-      fetchTasks();
-    }, 2000);
-  }, []);
   return (
     <div className="sidebar">
       <div className="greeting">
