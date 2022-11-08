@@ -3,10 +3,11 @@ import "./sidebar.css";
 import { useEffect, useState } from "react";
 import { LinearProgress } from "@mui/material";
 import convertTens from "../utilities/convertTens";
+import { useSelector } from "react-redux";
 
 const Sidebar = () => {
   const [date, setdate] = useState(new Date());
-  const [tasks, settasks] = useState({});
+  const tasks = useSelector((state) => state.tasks);
   let hours;
   let minutes;
   hours = date.getHours();

@@ -7,17 +7,18 @@ import { useState, useEffect } from "react";
 import convertTens from "../utilities/convertTens";
 import { LinearProgress } from "@mui/material";
 import { doc, setDoc } from "firebase/firestore";
-import { db } from "../firebase";
-import { useSelector } from "react-redux";
+import { db } from "../firebase/firebase";
+import { useDispatch, useSelector } from "react-redux";
 import { onSnapshot } from "firebase/firestore";
+import { tasksActions } from "../../store/tasksSlicer";
 
 const Notes = () => {
+  const tasks = useSelector((state) => state.tasks);
+  const dispatch = useDispatch();
   const [task, settask] = useState("");
   const [taskId, settaskId] = useState(0);
-  const [tasks, settasks] = useState({});
   const [deadline, setdeadline] = useState("");
   const currentUser = useSelector((state) => state.auth.user);
-
   const handleTaskChange = (e) => {
     const new_task = e.target.value;
     settask(new_task);
@@ -52,7 +53,7 @@ const Notes = () => {
       await setDoc(
         doc(db, "notes", `${currentUser.uid}`),
         {
-          note: [
+          notes: [
             ...tasks.data,
             {
               title: task,
@@ -78,7 +79,7 @@ const Notes = () => {
     newtasks.splice(taskId, 1, new_obj);
     await setDoc(
       doc(db, "notes", `${currentUser.uid}`),
-      { note: newtasks },
+      { notes: newtasks },
       { merge: true }
     );
     fetchTasks();
@@ -107,14 +108,13 @@ const Notes = () => {
     newtasks.splice(id, 1);
     await setDoc(
       doc(db, "notes", `${currentUser.uid}`),
-      { note: newtasks },
+      { notes: newtasks },
       { merge: true }
     );
   };
-
   const fetchTasks = () => {
     onSnapshot(doc(db, "notes", `${currentUser.uid}`), (snapshot) => {
-      settasks({ data: snapshot.data().note });
+      dispatch(tasksActions.updateTasks(snapshot.data().notes));
     });
   };
   useEffect(() => {

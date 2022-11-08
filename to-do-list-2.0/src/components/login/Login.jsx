@@ -1,6 +1,6 @@
 import React from "react";
 import "./login.css";
-import { auth } from "../firebase";
+import { auth } from "../firebase/firebase";
 import image from "../images/Checklist.gif";
 import image2 from "../images/Completed.gif";
 import logo from "../images/oases.png";
@@ -21,13 +21,14 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { authActions } from "../../store/authSlicer";
-import { db } from "../firebase";
+import { db } from "../firebase/firebase";
 import { setDoc, doc } from "firebase/firestore";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.auth.user);
+  const newUser = useSelector((state) => state.auth.newUser);
   const [Email, setEmail] = useState("");
   const [password, setpassword] = useState("");
   const [conPassword, setconPassword] = useState("");
@@ -43,10 +44,19 @@ const Login = () => {
   });
 
   const createUserNote = async () => {
+    console.log(currentUser);
     await setDoc(doc(db, "notes", `${currentUser.uid}`), {
-      id: 0,
+      notes: [],
     });
   };
+
+  useEffect(() => {
+    localStorage.setItem("user", JSON.stringify(currentUser));
+    if (newUser) {
+      createUserNote();
+    }
+  }, [currentUser]);
+
   useEffect(() => {
     handlePasswordValid();
     handleConPasswordValid();
@@ -147,39 +157,36 @@ const Login = () => {
     if (!(errMessage.conPassword || errMessage.password || errMessage.Email)) {
       createUserWithEmailAndPassword(auth, Email, password)
         .then((userCredential) => {
-          const user = userCredential.user;
-          dispatch(
-            authActions.login(
-              localStorage.setItem("user", JSON.stringify(user))
-            )
-          );
-          createUserNote();
+          const user = JSON.stringify(userCredential.user);
+          dispatch(authActions.setNewUser());
+          dispatch(authActions.login(user));
+        })
+        .then(() => {
           navigate("/");
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
-          console.log(errorMessage);
+          alert(errorMessage);
         });
     }
   };
   const handleLoginRq = () => {
     signInWithEmailAndPassword(auth, Email, password)
       .then((userCredential) => {
-        const user = userCredential.user;
-        dispatch(
-          authActions.login(localStorage.setItem("user", JSON.stringify(user)))
-        );
+        const user = JSON.stringify(userCredential.user);
+        dispatch(authActions.login(user));
+      })
+      .then(() => {
         navigate("/");
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(errorMessage);
+        alert(errorMessage);
       });
   };
 
-  console.log(currentUser);
   return (
     <>
       <div className="background">
